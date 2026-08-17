@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Votaciones</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Sistema de Votaciones</h1>
+        
+        <!-- Mostrar IP (solo informativo) -->
+        <div class="ip-info">
+            <span class="ip-label">🌐 Tu IP:</span>
+            <span class="ip-value">{{ ip }}</span>
+            <span class="ip-note">(Registrada para evitar votos duplicados)</span>
+        </div>
+        
+        <div class="voting-section">
+            <h2>Selecciona un candidato y tu puntaje</h2>
+            
+            <!-- Formulario para nombre del votante -->
+            <div class="voter-name-section">
+                <label for="nombreVotante">👤 Tu nombre:</label>
+                <input type="text" id="nombreVotante" placeholder="Ingresa tu nombre" required>
+            </div>
+            
+            <div class="candidates">
+                <div class="candidate" data-name="Emilia">
+                    <h3>👩 Emilia</h3>
+                    <p>Excelente liderazgo</p>
+                    {% if 'Emilia' in votos_usuario %}
+                        <span class="voted-badge">✅ Ya votaste</span>
+                    {% endif %}
+                </div>
+                <div class="candidate" data-name="Oscar">
+                    <h3>👨 Oscar</h3>
+                    <p>Gran capacidad de gestión</p>
+                    {% if 'Oscar' in votos_usuario %}
+                        <span class="voted-badge">✅ Ya votaste</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="voting-controls">
+                <div class="score-control">
+                    <label>Puntaje (0-100):</label>
+                    <input type="range" min="0" max="100" value="50" id="scoreSlider">
+                    <span id="scoreDisplay">50</span>
+                </div>
+                <button id="votarBtn" class="btn-votar">Votar</button>
+            </div>
+            <div id="mensaje" class="mensaje"></div>
+        </div>
+
+        <!-- Sección de estadísticas siempre visible -->
+        <div class="results-section">
+            <h2>📊 Estadísticas de Votación</h2>
+            <div class="stats-container">
+                {% if estadisticas %}
+                    {% for stat in estadisticas %}
+                    <div class="stat-item">
+                        <div class="stat-header">
+                            <span class="candidate-name">{{ stat[0] }}</span>
+                            <span class="candidate-stats">
+                                {{ stat[1] }} votos | Promedio: {{ "%.1f"|format(stat[2]) }}
+                            </span>
+                        </div>
+                        <div class="stat-bar-container">
+                            <div class="stat-bar" style="width: {{ stat[2] }}%; background: linear-gradient(90deg, #4CAF50, #45a049);">
+                                <span class="stat-value">{{ "%.1f"|format(stat[2]) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No hay estadísticas disponibles</p>
+                {% endif %}
+            </div>
+            <button onclick="location.reload()" class="btn-actualizar">🔄 Actualizar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const scoreSlider = document.getElementById('scoreSlider');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const votarBtn = document.getElementById('votarBtn');
+            const mensaje = document.getElementById('mensaje');
+            const nombreVotante = document.getElementById('nombreVotante');
+            
+            // Actualizar display del puntaje
+            if (scoreSlider) {
+                scoreSlider.addEventListener('input', function() {
+                    scoreDisplay.textContent = this.value;
+                });
+            }
+            
+            // Manejar click en candidato
+            let selectedCandidate = null;
+            document.querySelectorAll('.candidate').forEach(card => {
+                card.addEventListener('click', function() {
+                    // Verificar si ya votó por este candidato
+                    if (this.querySelector('.voted-badge')) {
+                        mostrarMensaje('❌ Ya votaste por este candidato', 'error');
+                        return;
+                    }
+                    
+                    document.querySelectorAll('.candidate').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedCandidate = this.dataset.name;
+                });
+            });
+            
+            // Manejar voto
+            if (votarBtn) {
+                votarBtn.addEventListener('click', function() {
+                    const nombre = nombreVotante.value.trim();
+                    
+                    if (!nombre) {
+                        mostrarMensaje('❌ Por favor, ingresa tu nombre', 'error');
+                        nombreVotante.focus();
+                        return;
+                    }
+                    
+                    if (!selectedCandidate) {
+                        mostrarMensaje('❌ Por favor, selecciona un candidato', 'error');
+                        return;
+                    }
+                    
+                    const puntaje = parseInt(scoreSlider.value);
+                    
+                    // Deshabilitar botón mientras se procesa
+                    votarBtn.disabled = true;
+                    votarBtn.textContent = '⏳ Procesando...';
+                    
+                    fetch('/votar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            nombre_votante: nombre,
+                            candidato: selectedCandidate,
+                            puntaje: puntaje
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            mostrarMensaje('✅ ' + data.message, 'success');
+                            setTimeout(() => {
+                                location.reload();
+                            }, 2000);
+                        } else {
+                            mostrarMensaje('❌ ' + data.error, 'error');
+                            votarBtn.disabled = false;
+                            votarBtn.textContent = 'Votar';
+                        }
+                    })
+                    .catch(error => {
+                        mostrarMensaje('❌ Error al enviar el voto', 'error');
+                        votarBtn.disabled = false;
+                        votarBtn.textContent = 'Votar';
+                    });
+                });
+            }
+        });
+        
+        function mostrarMensaje(texto, tipo) {
+            const mensaje = document.getElementById('mensaje');
+            mensaje.textContent = texto;
+            mensaje.className = 'mensaje ' + tipo;
+            mensaje.style.display = 'block';
+            
+            setTimeout(() => {
+                mensaje.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
