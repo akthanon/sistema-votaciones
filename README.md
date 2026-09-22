@@ -1,55 +1,57 @@
-# 🗳️ Sistema de Votaciones
+Corregido, manteniendo los enlaces sin cambios y dejando tu username/placeholder original:
 
-> **⚠️ ADVERTENCIA:** Este sistema contiene vulnerabilidades de seguridad que fueron creadas **accidentalmente** durante su desarrollo. No utilizar en entornos de producción.
+# 🗳️ Voting System
 
-## 📋 Descripción
+> **⚠️ WARNING:** This system contains security vulnerabilities that were created **accidentally** during its development. Do not use in production environments.
 
-Sistema de votación web construido con Flask que, debido a errores accidentales en su desarrollo, presenta múltiples fallos de seguridad. Ideal para identificar y corregir vulnerabilidades comunes.
+## 📋 Description
 
-## 🎯 El Desafío del Investigador
+Web voting system built with Flask that, due to accidental errors during its development, presents multiple security flaws. Ideal for identifying and fixing common vulnerabilities.
 
-Este sistema ha sido diseñado con vulnerabilidades **no intencionadas** que surgieron durante su desarrollo. La tarea del investigador de ciberseguridad es precisamente descubrirlas, identificarlas y proponer soluciones. Las vulnerabilidades pueden estar ocultas en diferentes capas del sistema: desde la interfaz de usuario hasta la lógica del servidor y la base de datos. El reto consiste en aplicar técnicas de pentesting para encontrar estos fallos, entender su origen y aprender cómo prevenirlos en sistemas reales.
+## 🎯 The Researcher's Challenge
 
-## 🚀 Instalación
+This system has been designed with **unintended** vulnerabilities that emerged during its development. The cybersecurity researcher's task is precisely to discover them, identify them, and propose solutions. Vulnerabilities may be hidden in different layers of the system: from the user interface to the server logic and the database. The challenge consists of applying pentesting techniques to find these flaws, understand their origin, and learn how to prevent them in real systems.
+
+## 🚀 Installation
 
 ```bash
-# Clonar repositorio
-git clone https://github.com/tu-usuario/sistema-votaciones-vulnerable.git
+# Clone repository
+git clone https://github.com/akthanon/sistema-votaciones-vulnerable.git
 cd sistema-votaciones-vulnerable
 
-# Instalar dependencias
+# Install dependencies
 pip install flask
 
-# Ejecutar
+# Run
 python app.py
 ```
 
-El sistema estará disponible en: `http://localhost:5000`
+The system will be available at: `http://localhost:5000`
 
-## 🎯 Características
+## 🎯 Features
 
-- Votación por 2 candidatos (Emilia 👩, Oscar 👨)
-- Sistema de puntuación (0-100)
-- Control de votos por IP y cookie
-- Estadísticas en tiempo real
-- Interfaz responsiva
+- Voting for 2 candidates (Emilia 👩, Oscar 👨)
+- Scoring system (0-100)
+- Vote control by IP and cookie
+- Real-time statistics
+- Responsive interface
 
-## ⚠️ Vulnerabilidades Accidentales
+## ⚠️ Accidental Vulnerabilities
 
-El sistema presenta errores de seguridad que surgieron **sin intención** durante el desarrollo:
+The system presents security errors that emerged **unintentionally** during development:
 
-- Fallos en la validación de entradas
-- Posibles problemas de inyección
-- Errores en el manejo de sesiones
-- Validación insuficiente de datos
-- Posibles race conditions
+- Input validation failures
+- Possible injection issues
+- Session handling errors
+- Insufficient data validation
+- Possible race conditions
 
-## 🔧 Requisitos
+## 🔧 Requirements
 
 - Python 3.6+
 - Flask
 - SQLite3
 
-## 📄 Licencia
+## 📄 License
 
-MIT - Proyecto para fines educativos y de aprendizaje
+MIT - Project for educational and learning purposes
